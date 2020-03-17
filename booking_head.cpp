@@ -61,7 +61,7 @@ int receppart(){ //ฟังก์ชันต่อจาก checkuser เป�
 }
 
 void booking(roomtype &room,guestinfo &info,vector<guestinfo> &roomstatus){ //ฟังก์ชันการจอง
-    int date[2],month,year,slroom[10],phonenumber,roomNO,totalprice=0,bookingNum,Numofday=0;
+    int date[2],month[2],year,slroom[10],phonenumber,roomNO,totalprice=0,bookingNum,Numofday=0;
     string name,email;
     char type,confirm;
     cout << "---------------------------------";
@@ -69,11 +69,11 @@ void booking(roomtype &room,guestinfo &info,vector<guestinfo> &roomstatus){ //�
     cout << "\n---------------------------------";
     cout << "\nPlease in put a check-in date (dd/mm/yyyy)  : "; //รับวันเช็คอิน
     cin >> info.checkindate;
-    sscanf(info.checkindate.c_str(),"%d/%d/%d",&date[0],&month,&year);
+    sscanf(info.checkindate.c_str(),"%d/%d/%d",&date[0],&month[0],&year);
     cout << "Please in put a check-out date (dd/mm/yyyy) : "; //รับวันเช็คเอาท์
     cin >> info.checkoutdate;
-    sscanf(info.checkoutdate.c_str(),"%d/%d/%d",&date[1],&month,&year);
-    Numofday=date[1]-date[0];
+    sscanf(info.checkoutdate.c_str(),"%d/%d/%d",&date[1],&month[1],&year);
+    Numofday = date[1]-date[0];
     cout << "---------------------------------";
     cout << "\nNumber of room : "; //เช็คจำนวนห้องที่จะจอง
     cin >> roomNO;
@@ -104,84 +104,85 @@ void booking(roomtype &room,guestinfo &info,vector<guestinfo> &roomstatus){ //�
                 }
             }
         }
-        cout << "\nSelected room : "; //เลือกห้องที่จะจอง
+        cout << "\nPlease select a room : "; //เลือกห้องที่จะจอง
         cin >> slroom[i];
-        if (slroom[i - 1] == slroom[i] && i != 0) { //ถ้าเลือกห้องซ้ำให้เปลี่ยนเลขห้องใหม่
-            cout << "Please select again : ";
-            cin >> slroom[i];
-            i--;
+        for(int j=0;j<i;j++){ //แก้errorแล้วจ้า
+            if (slroom[i - (j+1)] == slroom[i] && i != 0) { //ถ้าเลือกห้องซ้ำให้เปลี่ยนเลขห้องใหม่
+                cout << "Please select again : ";
+                cin >> slroom[i];
+            }
         }
     }
-        //คอนเฟิร์มห้อง
-        cout << "---------------------------------";
-        cout << "\nBooking information";
+    //คอนเฟิร์มห้อง
+    cout << "---------------------------------";
+    cout << "\nBooking information";
+    cout << "\n---------------------------------";
+    //แสดงสถานะห้องที่เลือก
+    for(int i=0;i<roomNO;i++){
+        cout << "\nRoom " << i+1 << " Information";
         cout << "\n---------------------------------";
-        //แสดงสถานะห้องที่เลือก
-        for(int i=0;i<roomNO;i++){
-            cout << "\nRoom " << i+1 << " Information";
-            cout << "\n---------------------------------";
-            if((slroom[i]%1000)/100==1){
-                cout << "\nRoom type : " << room.type[0];
-                cout << "\nRoom number : " << slroom[i];
-                cout << "\nRoom price : " << room.price[0] << " ฿.";
-                totalprice+=room.price[0];
-            } else if((slroom[i]%1000)/100==2){
-                cout << "\nRoom type : " << room.type[1];
-                cout << "\nRoom number : " << slroom[i];
-                cout << "\nRoom price : " << room.price[1] << " ฿.";
-                totalprice+=room.price[1];
-            } else{
-                cout << "\nRoom type : " << room.type[2];
-                cout << "\nRoom number : " << slroom[i];
-                cout << "\nRoom price : " << room.price[2] << " ฿.";
-                totalprice+=room.price[2];
-            }
-            cout << "\n---------------------------------";
+        if((slroom[i]%1000)/100==1){
+            cout << "\nRoom type : " << room.type[0];
+            cout << "\nRoom number : " << slroom[i];
+            cout << "\nRoom price : " << room.price[0] << " ฿.";
+            totalprice+=room.price[0];
+        } else if((slroom[i]%1000)/100==2){
+            cout << "\nRoom type : " << room.type[1];
+            cout << "\nRoom number : " << slroom[i];
+            cout << "\nRoom price : " << room.price[1] << " ฿.";
+            totalprice+=room.price[1];
+        } else{
+            cout << "\nRoom type : " << room.type[2];
+            cout << "\nRoom number : " << slroom[i];
+            cout << "\nRoom price : " << room.price[2] << " ฿.";
+            totalprice+=room.price[2];
         }
-        totalprice=totalprice*Numofday; //รวมค่าใช้จ่าย
-        cin.ignore();
-        cout << "\nTotal : " << totalprice << " ฿.";
-        //รับข้อมูลลูกค้า
         cout << "\n---------------------------------";
-        cout << "\nGuest information";
-        cout << "\n---------------------------------";
-        cout << "\nName : ";
-        getline(cin,info.name);
-        cout << "Email : ";
-        cin >> info.email;
-        cout << "Tel : ";
-        cin >> info.phonenumber;
-        //คอนเฟิร์มการจอง
-        cout << "---------------------------------";
-        cout << "\nConfirm booking information";
-        cout << "\nYES[Y] or NO[N] : ";
-        cin >> confirm;
-        if(confirm=='Y'){
-            bookingNum=rand()%89999+10000;
-            for(int j=0;j<roomNO;j++){
-                for(int i=0;i<24;i++){ //เงื่อนไขเปลี่ยนสถานะของห้องที่ถูกจองให้เป็น U (unavialable)
-                    if(room.roomnumber[i]==slroom[j]){
-                        room.status[i]='U';
-                        room.bookingNO[i]=bookingNum;
-                        info.roomdata=&room;
-                        roomstatus.push_back(info); // พุชข้อมูลลูกค้าเข้า vector
-                    }
+    }
+    totalprice=totalprice*Numofday; //รวมค่าใช้จ่าย
+    cin.ignore();
+    cout << "\nTotal : " << totalprice << " ฿.";
+    //รับข้อมูลลูกค้า
+    cout << "\n---------------------------------";
+    cout << "\nGuest information";
+    cout << "\n---------------------------------";
+    cout << "\nName : ";
+    getline(cin,info.name);
+    cout << "Email : ";
+    cin >> info.email;
+    cout << "Tel : ";
+    cin >> info.phonenumber;
+    //คอนเฟิร์มการจอง
+    cout << "---------------------------------";
+    cout << "\nConfirm booking information";
+    cout << "\nYES[Y] or NO[N] : ";
+    cin >> confirm;
+    if(confirm=='Y'){
+        bookingNum=rand()%89999+10000;
+        for(int j=0;j<roomNO;j++){
+            for(int i=0;i<24;i++){ //เงื่อนไขเปลี่ยนสถานะของห้องที่ถูกจองให้เป็น U (unavialable)
+                if(room.roomnumber[i]==slroom[j]){
+                    room.status[i]='U';
+                    room.bookingNO[i]=bookingNum;
+                    info.roomdata=&room;
+                    roomstatus.push_back(info); // พุชข้อมูลลูกค้าเข้า vector
                 }
             }
-            //สร้าง booking number ไว้ดูสถานะห้องสำหรับลูกค้า
-            cout << "---------------------------------";
-            cout << "\nChecking room status by using this booking number.";
-            cout << "\nBooking Number : " << bookingNum;
-            cout << "\n---------------------------------";
-            cout << "\nThank you for choosing our hotel.";
-            cout << "\n*** Have a nice vacation ***";
-            cout << "\n---------------------------------";
-            
-        }else{
-            cout << "---------------------------------";
-            cout << "*** Booking was canceled ***";
-            cout << "\n---------------------------------";
         }
+        //สร้าง booking number ไว้ดูสถานะห้องสำหรับลูกค้า
+        cout << "---------------------------------";
+        cout << "\nChecking room status by using this booking number.";
+        cout << "\nBooking Number : " << bookingNum;
+        cout << "\n---------------------------------";
+        cout << "\nThank you for choosing our hotel.";
+        cout << "\n*** Have a nice vacation ***";
+        cout << "\n---------------------------------";
+
+    }else{
+        cout << "---------------------------------";
+        cout << "*** Booking was canceled ***";
+        cout << "\n---------------------------------";
+    }
 }
 
 int main() {
